@@ -1,0 +1,67 @@
+-- Tabela "Hóspedes"
+CREATE TABLE Hospedes (
+    HospedeID serial PRIMARY KEY,
+    Nome varchar(100),
+    Email varchar(100),
+    Telefone varchar(15)
+);
+
+-- Tabela "Quartos"
+CREATE TABLE Quartos (
+    QuartoID serial PRIMARY KEY,
+    NumeroQuarto varchar(10),
+    TipoQuarto varchar(50),
+    Preco decimal
+);
+
+-- Tabela "Reservas"
+CREATE TABLE Reservas (
+    ReservaID serial PRIMARY KEY,
+    HospedeID integer REFERENCES Hospedes(HospedeID),
+    QuartoID integer REFERENCES Quartos(QuartoID),
+    DataEntrada date,
+    DataSaida date
+);
+
+-- Tabela "Serviços"
+CREATE TABLE Servicos (
+    ServicoID serial PRIMARY KEY,
+    Nome varchar(100),
+    Preco decimal
+);
+
+-- Tabela "Pagamentos"
+CREATE TABLE Pagamentos (
+    PagamentoID serial PRIMARY KEY,
+    ReservaID integer REFERENCES Reservas(ReservaID),
+    ServicoID integer REFERENCES Servicos(ServicoID),
+    ValorTotal decimal,
+    DataPagamento date
+);
+
+-- Inserir hóspedes
+INSERT INTO Hospedes (Nome, Email, Telefone) VALUES ('João Silva', 'joao@gmail.com', '(11) 1234-5678');
+INSERT INTO Hospedes (Nome, Email, Telefone) VALUES ('Maria Souza', 'maria@gmail.com', '(11) 9876-5432');
+
+-- Inserir quartos
+INSERT INTO Quartos (NumeroQuarto, TipoQuarto, Preco) VALUES ('101', 'Luxo', 200.00);
+INSERT INTO Quartos (NumeroQuarto, TipoQuarto, Preco) VALUES ('102', 'Standard', 100.00);
+
+-- Inserir reservas
+INSERT INTO Reservas (HospedeID, QuartoID, DataEntrada, DataSaida) VALUES (1, 1, '2023-01-15', '2023-01-20');
+INSERT INTO Reservas (HospedeID, QuartoID, DataEntrada, DataSaida) VALUES (2, 2, '2023-02-10', '2023-02-15');
+
+-- Inserir serviços
+INSERT INTO Servicos (Nome, Preco) VALUES ('Café da Manhã', 15.00);
+INSERT INTO Servicos (Nome, Preco) VALUES ('Estacionamento', 10.00);
+
+-- Inserir pagamentos
+INSERT INTO Pagamentos (ReservaID, ServicoID, ValorTotal, DataPagamento) VALUES (1, 1, 215.00, '2023-01-18');
+INSERT INTO Pagamentos (ReservaID, ServicoID, ValorTotal, DataPagamento) VALUES (2, 2, 110.00, '2023-02-12');
+
+SELECT Hospedes.Nome AS NomeHospede, Quartos.NumeroQuarto, Reservas.DataEntrada, Reservas.DataSaida, Servicos.Nome AS NomeServico
+FROM Reservas
+JOIN Hospedes ON Reservas.HospedeID = Hospedes.HospedeID
+JOIN Quartos ON Reservas.QuartoID = Quartos.QuartoID
+LEFT JOIN Pagamentos ON Reservas.ReservaID = Pagamentos.ReservaID
+LEFT JOIN Servicos ON Pagamentos.ServicoID = Servicos.ServicoID;
